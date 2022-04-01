@@ -6,7 +6,7 @@ commonLabels:
   cnf.example.com/vrouter: ""
 
 resources:
-- 03-create-namespace.yaml
+#- 03-create-namespace.yaml
 - 03-network-definition.yaml
 - 10-frr-configmap.yaml
 - 10-frr-configmap2.yaml

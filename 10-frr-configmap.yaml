@@ -1,0 +1,82 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frr-configs
+  namespace: frr
+data:
+  daemons: |
+    bgpd=yes
+    ospfd=no
+    ospf6d=no
+    ripd=no
+    ripngd=no
+    isisd=no
+    pimd=no
+    ldpd=no
+    nhrpd=no
+    eigrpd=no
+    babeld=no
+    sharpd=no
+    pbrd=no
+    bfdd=yes
+    fabricd=no
+    vrrpd=no
+    vtysh_enable=yes
+    zebra_options="  -A 127.0.0.1 -s 90000000"
+    bgpd_options="   -A 127.0.0.1"
+    ospfd_options="  -A 127.0.0.1"
+    ospf6d_options=" -A ::1"
+    ripd_options="   -A 127.0.0.1"
+    ripngd_options=" -A ::1"
+    isisd_options="  -A 127.0.0.1"
+    pimd_options="   -A 127.0.0.1"
+    ldpd_options="   -A 127.0.0.1"
+    nhrpd_options="  -A 127.0.0.1"
+    eigrpd_options=" -A 127.0.0.1"
+    babeld_options=" -A 127.0.0.1"
+    sharpd_options=" -A 127.0.0.1"
+    pbrd_options="   -A 127.0.0.1"
+    staticd_options="-A 127.0.0.1"
+    bfdd_options="   -A 127.0.0.1"
+    fabricd_options="-A 127.0.0.1"
+    vrrpd_options="  -A 127.0.0.1"
+  vtysh.conf: |
+    service integrated-vtysh-config
+  frr.conf: |
+    hostname vrouter
+    service integrated-vtysh-config
+    password frr
+    enable password frr
+    !
+    debug bfd peer
+    debug bfd zebra
+    debug bfd network
+    !
+    bfd
+     peer 198.18.112.254
+       no shutdown
+     !
+    !
+    router bgp 65500
+      bgp router-id 198.18.112.99
+      no bgp ebgp-requires-policy
+      neighbor 198.18.112.254 remote-as 65535
+      neighbor 198.18.112.254 bfd
+      neighbor 198.18.112.254 graceful-restart
+      !
+      address-family ipv4 unicast
+        redistribute connected metric 100
+        redistribute static metric 150
+      exit-address-family
+    !
+    ! subnets for each node
+    ip route 10.128.2.0/23 198.18.111.12
+    ip route 10.129.0.0/23 198.18.111.13
+    ip route 10.128.0.0/23 198.18.111.14
+    ip route 10.130.0.0/23 198.18.111.15
+    ip route 10.131.0.0/23 198.18.111.16
+    !
+    # log file /var/log/frr/frr.log debugging
+    log file /tmp/frr.log debugging
+    #log stdout debugging
